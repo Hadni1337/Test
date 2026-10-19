@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест: Цифровая схемотехника (100 вопросов)</title>
+<style>
+  :root {
+    --bg: #f4f6fb;
+    --card: #ffffff;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-soft: #dbeafe;
+    --ok: #16a34a;
+    --ok-soft: #dcfce7;
+    --bad: #dc2626;
+    --bad-soft: #fee2e2;
+    --border: #e5e7eb;
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 24px 12px 60px;
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 26px; }
+  header h1 { font-size: 1.7rem; margin: 0 0 8px; }
+  header p { color: var(--muted); margin: 0; }
+  .badge {
+    display: inline-block;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: .8rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 10px;
+  }
+  .progress-bar {
+    height: 8px;
+    background: var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 18px 0 26px;
+  }
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #2563eb, #22d3ee);
+    transition: width .3s ease;
+  }
+  .question-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 20px 16px;
+    margin-bottom: 18px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  }
+  .q-head {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 14px;
+  }
+  .q-num {
+    flex: 0 0 auto;
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: .9rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .q-text { font-weight: 600; font-size: 1.02rem; }
+  .q-type {
+    display: inline-block;
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .02em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-bottom: 8px;
+  }
+  .q-type.single { background: #eef2ff; color: #4338ca; }
+  .q-type.multi { background: #fef3c7; color: #b45309; }
+  .options { list-style: none; padding: 0; margin: 0; }
+  .options li { margin-bottom: 8px; }
+  .options label {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    user-select: none;
+  }
+  .options label:hover { border-color: #93c5fd; background: #f8fafc; }
+  .options input { margin-top: 3px; accent-color: var(--accent); }
+  .options label.correct { border-color: var(--ok); background: var(--ok-soft); }
+  .options label.incorrect { border-color: var(--bad); background: var(--bad-soft); }
+  .feedback {
+    margin-top: 10px;
+    font-size: .88rem;
+    font-weight: 600;
+    display: none;
+  }
+  .feedback.ok { color: var(--ok); display: block; }
+  .feedback.bad { color: var(--bad); display: block; }
+  .actions {
+    display: flex; flex-wrap: wrap; gap: 12px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+  button {
+    font: inherit;
+    font-weight: 600;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 26px;
+    cursor: pointer;
+    transition: transform .1s, box-shadow .15s, background .15s;
+  }
+  button:active { transform: translateY(1px); }
+  .btn-primary {
+    background: var(--accent); color: #fff;
+    box-shadow: 0 4px 14px rgba(37,99,235,.3);
+  }
+  .btn-primary:hover { background: #1d4ed8; }
+  .btn-secondary {
+    background: #fff; color: var(--text);
+    border: 1.5px solid var(--border);
+  }
+  .btn-secondary:hover { background: #f3f4f6; }
+  #result {
+    display: none;
+    margin-top: 28px;
+    padding: 22px;
+    border-radius: var(--radius);
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+  #result .score { font-size: 2rem; color: var(--accent); display: block; margin-bottom: 6px; }
+  #result .verdict { font-weight: 500; color: var(--muted); font-size: .95rem; display: block; margin-bottom: 14px; }
+  .grade-box {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 14px 26px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+  }
+  .grade-label {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+  }
+  .grade-value {
+    font-size: 1.9rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .grade-value.g5 { color: #16a34a; }
+  .grade-value.g4 { color: #2563eb; }
+  .grade-value.g3 { color: #d97706; }
+  .grade-value.g2 { color: #dc2626; }
+  .grade-desc {
+    font-size: .85rem;
+    color: var(--muted);
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  @media (max-width: 520px) {
+    body { padding: 16px 8px 40px; }
+    .question-card { padding: 16px 14px 12px; }
+    header h1 { font-size: 1.35rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="badge">Цифровая схемотехника · банк 100 вопросов</span>
+    <h1>Случайный тест</h1>
+    <p>При каждой загрузке выбираются 20 случайных вопросов из 100</p>
+  </header>
+
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <form id="quiz" autocomplete="off"></form>
+
+  <div class="actions">
+    <button type="button" class="btn-primary" id="checkBtn">Проверить ответы</button>
+    <button type="button" class="btn-secondary" id="resetBtn">Новый тест</button>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<script>
+/* ----------------------------- БАНК ВОПРОСОВ (100) -----------------------------
+   type: 'single' | 'multi'
+   options: массив строк
+   correct: массив индексов правильных вариантов (в исходном порядке options)
+------------------------------------------------------------------------------- */
+const questionBank = [
+  /* ---------- Системы счисления и кодирование ---------- */
+  {type:'single', text:'Какое минимальное основание может иметь позиционная система счисления, в которой используется цифра 7?', options:['8','7','10','16'], correct:[0], explanation:'В системе с основанием p используются цифры от 0 до p−1. Чтобы цифра 7 была допустима, нужно p > 7, то есть минимум 8.'},
+  {type:'single', text:'Чему равно десятичное число 45 в двоичной системе?', options:['101101₂','110101₂','100101₂','111001₂'], correct:[0], explanation:'45 = 32 + 8 + 4 + 1 = 101101₂.'},
+  {type:'single', text:'Сколько двоичных разрядов содержит одна шестнадцатеричная цифра?', options:['4','3','8','2'], correct:[0], explanation:'16 = 2⁴, поэтому одна шестнадцатеричная цифра кодируется четырьмя битами.'},
+  {type:'single', text:'Какое число в дополнительном коде (8 бит) соответствует −13?', options:['11110011₂','10001101₂','11110010₂','10001100₂'], correct:[0], explanation:'13 = 00001101₂. Инверсия 11110010, +1 → 11110011₂.'},
+  {type:'single', text:'Чему равно восьмеричное число 725₈ в десятичной системе?', options:['469','475','461','481'], correct:[0], explanation:'7·64 + 2·8 + 5 = 448 + 16 + 5 = 469.'},
+  {type:'single', text:'Переведите двоичное число 10101111₂ в шестнадцатеричную систему.', options:['AF₁₆','A5₁₆','BF₁₆','9F₁₆'], correct:[0], explanation:'1010₂ = A, 1111₂ = F → AF₁₆.'},
+  {type:'single', text:'Какое десятичное число соответствует шестнадцатеричному 2A₁₆?', options:['42','40','44','32'], correct:[0], explanation:'2·16 + 10 = 32 + 10 = 42.'},
+  {type:'single', text:'Чему равно число −9 в прямом коде (8 бит)?', options:['10001001₂','11110110₂','11110111₂','00001001₂'], correct:[0], explanation:'Старший бит — знак (1 для отрицательного), остальные — модуль 9 = 0001001 → 10001001₂.'},
+  {type:'single', text:'Чему равно число −9 в обратном коде (8 бит)?', options:['11110110₂','10001001₂','11110111₂','10001000₂'], correct:[0], explanation:'Прямой код 10001001, инвертируем все биты (кроме знакового в классической схеме) — для 8-бит получаем 11110110₂.'},
+  {type:'single', text:'Какое число соответствует дополнительному коду 11111011₂ (8 бит)?', options:['−5','−4','−3','−6'], correct:[0], explanation:'Старший бит 1 → число отрицательное. Инверсия 00000100, +1 → 00000101 = 5, значит −5.'},
+  {type:'single', text:'Чему равно десятичное число 255 в шестнадцатеричной системе?', options:['FF₁₆','FE₁₆','F0₁₆','100₁₆'], correct:[0], explanation:'255 = 15·16 + 15 = FF₁₆.'},
+  {type:'single', text:'Сколько различных значений можно закодировать 8 битами?', options:['256','128','255','512'], correct:[0], explanation:'2⁸ = 256 различных комбинаций (от 0 до 255).'},
+  {type:'single', text:'Какое из чисел является корректной записью в двоичной системе счисления?', options:['101101₂','102101₂','2011₂','1012₂'], correct:[0], explanation:'В двоичной системе допустимы только цифры 0 и 1.'},
+  {type:'single', text:'Что такое основание системы счисления?', options:['Количество различных цифр, используемых для записи чисел','Количество разрядов в числе','Максимальное число, которое можно записать','Вес старшего разряда'], correct:[0], explanation:'Основание — количество различных цифр, включая ноль, используемых в данной системе.'},
+  {type:'single', text:'Переведите двоичное 11010110₂ в восьмеричную систему.', options:['326₈','316₈','336₈','324₈'], correct:[0], explanation:'011 010 110 → 3 2 6 → 326₈.'},
+
+  /* ---------- Алгебра логики, СДНФ/СКНФ ---------- */
+  {type:'single', text:'Какой логический элемент даёт 1 только при обоих входах, равных 1?', options:['И (AND)','ИЛИ (OR)','XOR','NOR'], correct:[0], explanation:'Конъюнкция истинна только при x1 = 1 и x2 = 1.'},
+  {type:'single', text:'Какое выражение соответствует XOR?', options:['(¬a ∧ b) ∨ (a ∧ ¬b)','a ∧ b','a ∨ b','¬(a ∧ b)'], correct:[0], explanation:'XOR истинен, когда входы различны.'},
+  {type:'single', text:'Какая форма строится по строкам, где F = 1?', options:['СДНФ','СКНФ','ДНФ','КНФ'], correct:[0], explanation:'СДНФ — дизъюнкция конституент единицы.'},
+  {type:'single', text:'Какая форма строится по строкам, где F = 0?', options:['СКНФ','СДНФ','ДНФ','КНФ'], correct:[0], explanation:'СКНФ — конъюнкция конституент нуля.'},
+  {type:'single', text:'Сколько строк содержит таблица истинности для функции от 3 переменных?', options:['8','6','9','16'], correct:[0], explanation:'2³ = 8 строк.'},
+  {type:'single', text:'Какое правило используется при подписывании карты Карно?', options:['Код Грея','Обычный двоичный код','Код Хэмминга','Код с избыточностью'], correct:[0], explanation:'Соседние клетки должны отличаться только одним разрядом — порядок 00, 01, 11, 10.'},
+  {type:'single', text:'Какой закон утверждает, что ¬(A ∧ B) = ¬A ∨ ¬B?', options:['Закон де Моргана','Закон дистрибутивности','Закон поглощения','Закон идемпотентности'], correct:[0], explanation:'Это первый закон де Моргана.'},
+  {type:'single', text:'Чему равно A ∨ ¬A?', options:['1','0','A','¬A'], correct:[0], explanation:'Закон исключённого третьего: A ∨ ¬A = 1.'},
+  {type:'single', text:'Чему равно A ∧ ¬A?', options:['0','1','A','¬A'], correct:[0], explanation:'Закон противоречия: A ∧ ¬A = 0.'},
+  {type:'single', text:'Какое выражение соответствует импликации A → B?', options:['¬A ∨ B','A ∧ ¬B','A ∨ ¬B','¬A ∧ B'], correct:[0], explanation:'Импликация ложна только когда A = 1, B = 0, что эквивалентно ¬A ∨ B.'},
+  {type:'single', text:'Какое выражение соответствует эквивалентности A ↔ B?', options:['(A ∧ B) ∨ (¬A ∧ ¬B)','A ∧ B','A ∨ B','A ⊕ B'], correct:[0], explanation:'Эквивалентность истинна, когда A и B совпадают.'},
+  {type:'single', text:'Какой закон позволяет записать A ∨ (A ∧ B) = A?', options:['Закон поглощения','Закон дистрибутивности','Закон де Моргана','Закон двойного отрицания'], correct:[0], explanation:'Закон поглощения: A ∨ (A ∧ B) = A.'},
+  {type:'single', text:'Чему равно ¬(¬A)?', options:['A','¬A','0','1'], correct:[0], explanation:'Закон двойного отрицания.'},
+  {type:'single', text:'Какая операция обозначается символом ⊕?', options:['Исключающее ИЛИ (XOR)','И (AND)','ИЛИ (OR)','НЕ (NOT)'], correct:[0], explanation:'⊕ — сложение по модулю 2, XOR.'},
+  {type:'single', text:'В СДНФ переменная берётся с отрицанием, если в данной строке она равна…', options:['0','1','не имеет значения','только для первой переменной'], correct:[0], explanation:'В СДНФ: если xi = 1 — берём xi, если xi = 0 — берём ¬xi.'},
+  {type:'single', text:'В СКНФ переменная берётся с отрицанием, если в данной строке она равна…', options:['1','0','не имеет значения','только для последней переменной'], correct:[0], explanation:'В СКНФ правило обратное: если xi = 0 — берём xi, если xi = 1 — берём ¬xi.'},
+  {type:'single', text:'Какой элемент является инвертором?', options:['НЕ (NOT)','И (AND)','ИЛИ (OR)','XOR'], correct:[0], explanation:'Инвертор реализует операцию отрицания ¬x.'},
+  {type:'single', text:'Сколько переменных может быть в карте Карно размером 4×4?', options:['4','3','5','6'], correct:[0], explanation:'4×4 = 16 клеток = 2⁴, значит 4 переменные.'},
+  {type:'single', text:'Чему равно 1 ∧ 0?', options:['0','1','не определено','зависит от контекста'], correct:[0], explanation:'Конъюнкция с 0 всегда даёт 0.'},
+  {type:'single', text:'Чему равно 1 ∨ 0?', options:['1','0','не определено','зависит от контекста'], correct:[0], explanation:'Дизъюнкция с 1 всегда даёт 1.'},
+  {type:'single', text:'Какая операция является ассоциативной?', options:['И (AND)','Импликация','XOR и AND одновременно','Только XOR'], correct:[0], explanation:'Конъюнкция и дизъюнкция ассоциативны; импликация — нет. В данном наборе правильный ответ — И (AND) как классический пример.'},
+
+  /* ---------- Комбинационные схемы ---------- */
+  {type:'single', text:'Что такое мультиплексор?', options:['Устройство, выбирающее один из нескольких входов и передающее его на выход','Устройство, распределяющее один вход на несколько выходов','Устройство сравнения двух чисел','Устройство хранения слова'], correct:[0], explanation:'Мультиплексор — «1 из m».'},
+  {type:'single', text:'Что такое демультиплексор?', options:['Устройство, коммутирующее один вход на один из нескольких выходов','Устройство выбора одного из входов','Устройство сравнения','Устройство хранения'], correct:[0], explanation:'Демультиплексор — «1 на m».'},
+  {type:'single', text:'Сколько адресных входов нужно мультиплексору «1 из 8»?', options:['3','2','4','8'], correct:[0], explanation:'2³ = 8, значит 3 адресных входа.'},
+  {type:'single', text:'Сколько информационных входов у мультиплексора с 4 адресными входами?', options:['16','8','4','32'], correct:[0], explanation:'m = 2ⁿ = 2⁴ = 16.'},
+  {type:'single', text:'Что такое комбинационная схема?', options:['Схема, выход которой зависит только от текущих входов','Схема, выход которой зависит от предыдущего состояния','Схема с памятью','Схема на триггерах'], correct:[0], explanation:'Комбинационная схема не имеет памяти.'},
+  {type:'single', text:'Какое устройство преобразует унитарный код в двоичный?', options:['Шифратор','Дешифратор','Мультиплексор','Сумматор'], correct:[0], explanation:'Шифратор (кодер).'},
+  {type:'single', text:'Какое устройство преобразует двоичный код в унитарный (активирует один из выходов)?', options:['Дешифратор','Шифратор','Мультиплексор','Компаратор'], correct:[0], explanation:'Дешифратор (декодер).'},
+  {type:'single', text:'Что такое полусумматор?', options:['Схема сложения двух одноразрядных чисел без учёта переноса','Схема сложения с учётом переноса','Схема вычитания','Схема умножения'], correct:[0], explanation:'Полусумматор складывает два бита без входного переноса.'},
+  {type:'single', text:'Сколько входов у полного сумматора?', options:['3','2','4','1'], correct:[0], explanation:'a, b и Cin — три входа.'},
+  {type:'single', text:'Что такое компаратор?', options:['Схема сравнения двух чисел','Схема сложения','Схема хранения','Схема коммутации'], correct:[0], explanation:'Компаратор определяет соотношения A > B, A = B, A < B.'},
+  {type:'single', text:'Сколько выходов у типового компаратора?', options:['3','2','4','1'], correct:[0], explanation:'Выходы A > B, A = B, A < B.'},
+  {type:'single', text:'Какое устройство используется для выбора одного из нескольких сигналов?', options:['Мультиплексор','Демультиплексор','Сумматор','Триггер'], correct:[0], explanation:'Мультиплексор выбирает один из входов.'},
+  {type:'single', text:'Какая схема лежит в основе АЛУ?', options:['Сумматор','Триггер','Регистр','Счётчик'], correct:[0], explanation:'Сумматор — ключевая схема АЛУ.'},
+  {type:'single', text:'Что выполняет дешифратор «3 в 8»?', options:['Активирует один из 8 выходов по 3-битному коду','Преобразует 8 входов в 3-битный код','Хранит 8 слов','Сравнивает два 3-битных числа'], correct:[0], explanation:'Дешифратор активирует выход, номер которого равен входному коду.'},
+  {type:'single', text:'Какой вход дешифратора позволяет включать/отключать все выходы?', options:['Вход разрешения (Enable)','Адресный вход','Информационный вход','Тактовый вход'], correct:[0], explanation:'Стробирующий вход E разрешает работу дешифратора.'},
+
+  /* ---------- Триггеры, регистры, счётчики ---------- */
+  {type:'single', text:'Что такое триггер?', options:['Элементарная ячейка памяти на 1 бит','Комбинационная схема','Сумматор','Дешифратор'], correct:[0], explanation:'Триггер хранит 1 бит и является последовательностной схемой.'},
+  {type:'single', text:'Какая комбинация входов RS-триггера запрещена?', options:['S = 1, R = 1','S = 0, R = 0','S = 1, R = 0','S = 0, R = 1'], correct:[0], explanation:'S = R = 1 — запрещённая комбинация для базового RS-триггера.'},
+  {type:'single', text:'Какой триггер имеет один информационный вход D?', options:['D-триггер','T-триггер','JK-триггер','RS-триггер'], correct:[0], explanation:'D-триггер (задержки) копирует вход D на выход Q по такту.'},
+  {type:'single', text:'Какой триггер меняет состояние при каждом активном сигнале на входе T?', options:['T-триггер','D-триггер','RS-триггер','JK-триггер'], correct:[0], explanation:'T-триггер — счётный, переключается каждым тактом.'},
+  {type:'single', text:'Что происходит с JK-триггером при J = 1, K = 1?', options:['Переключение (счёт)','Сброс','Установка','Хранение'], correct:[0], explanation:'В отличие от RS, комбинация J = K = 1 переводит JK-триггер в режим счёта.'},
+  {type:'single', text:'Что такое регистр?', options:['Устройство хранения многоразрядного слова на триггерах','Комбинационная схема','Сумматор','Счётчик'], correct:[0], explanation:'Регистр — последовательностное устройство для хранения слова.'},
+  {type:'single', text:'Какой регистр принимает и выдаёт все биты одновременно?', options:['Параллельный','Сдвиговый','Кольцевой','Последовательный'], correct:[0], explanation:'Параллельный (накопительный) регистр.'},
+  {type:'single', text:'Что такое SIPO?', options:['Последовательный вход, параллельный выход','Параллельный вход, последовательный выход','Последовательный вход, последовательный выход','Параллельный вход, параллельный выход'], correct:[0], explanation:'Serial In — Parallel Out.'},
+  {type:'single', text:'Сколько устойчивых состояний у кольцевого регистра из n разрядов с единственной единицей?', options:['n','2n','2ⁿ','n²'], correct:[0], explanation:'Единица «бежит» по кругу, давая n состояний.'},
+  {type:'single', text:'Что такое счётчик?', options:['Узел для подсчёта импульсов и фиксации числа в коде','Узел хранения слова','Комбинационная схема сравнения','Узел коммутации'], correct:[0], explanation:'Счётчик считает импульсы и фиксирует результат.'},
+  {type:'single', text:'Какой триггер чаще всего используется в счётчиках?', options:['T-триггер (или JK в режиме счёта)','D-триггер','RS-триггер','Триггер Шмитта'], correct:[0], explanation:'Счётный режим T-триггера (или JK при J = K = 1).'},
+  {type:'single', text:'Что такое модуль счёта счётчика?', options:['Количество различных состояний счётчика','Максимальная частота','Число разрядов','Время установления'], correct:[0], explanation:'Модуль счёта Kсч = 2ⁿ для n-разрядного двоичного счётчика.'},
+  {type:'single', text:'Какой счётчик переключает разряды одновременно?', options:['Синхронный','Асинхронный','Кольцевой','Реверсивный'], correct:[0], explanation:'В синхронном счётчике все триггеры тактируются одновременно.'},
+  {type:'single', text:'Что такое делитель частоты?', options:['Устройство деления числа импульсов на заданный коэффициент','Устройство умножения частоты','Устройство хранения','Компаратор'], correct:[0], explanation:'Делитель частоты — счётчик с заданным коэффициентом пересчёта.'},
+  {type:'single', text:'Что делает регистр Джонсона?', options:['Обеспечивает 2n состояний при n триггерах','Даёт n состояний','Работает как сумматор','Хранит только 1 бит'], correct:[0], explanation:'За счёт инверсной обратной связи регистр Джонсона имеет 2n устойчивых состояний.'},
+
+  /* ---------- АЛУ, ЗУ, сигналы, индикаторы ---------- */
+  {type:'single', text:'Что такое АЛУ?', options:['Арифметико-логическое устройство','Аналоговый логический узел','Ассоциативное логическое устройство','Автоматический логический узел'], correct:[0], explanation:'ALU — Arithmetic Logic Unit.'},
+  {type:'single', text:'Какой флаг АЛУ устанавливается при нулевом результате?', options:['Z (Zero)','C (Carry)','S (Sign)','V (Overflow)'], correct:[0], explanation:'Флаг Z = 1, если результат равен 0.'},
+  {type:'single', text:'Какой флаг АЛУ сигнализирует о переполнении при работе со знаковыми числами?', options:['V (Overflow)','Z','C','S'], correct:[0], explanation:'Флаг переполнения V.'},
+  {type:'single', text:'Что такое ЗУ?', options:['Запоминающее устройство','Задающий усилитель','Знаковый указатель','Защитный узел'], correct:[0], explanation:'ЗУ — устройство для приёма, хранения и выдачи информации.'},
+  {type:'single', text:'Какая структура ЗУ использует один дешифратор на все слова?', options:['2D (линейная)','3D','2DM','Ассоциативная'], correct:[0], explanation:'В 2D весь адрес подаётся на один дешифратор n → 2ⁿ.'},
+  {type:'single', text:'Какая структура ЗУ использует два дешифратора X и Y?', options:['3D','2D','2DM','Последовательная'], correct:[0], explanation:'3D — координатная выборка по совпадению X и Y.'},
+  {type:'single', text:'Что такое SRAM?', options:['Статическая память на триггерах','Динамическая память на конденсаторах','Постоянная память','Флеш-память'], correct:[0], explanation:'SRAM хранит бит на триггере.'},
+  {type:'single', text:'Что такое DRAM?', options:['Динамическая память на конденсаторах с регенерацией','Статическая память на триггерах','Постоянная память','Кэш-память'], correct:[0], explanation:'DRAM требует периодической регенерации.'},
+  {type:'single', text:'Какой сигнал называется цифровым?', options:['Принимающий только два значения (с допустимыми отклонениями)','Принимающий любые значения','Гармонический','Содержащий только шум'], correct:[0], explanation:'Цифровой сигнал — двухуровневый.'},
+  {type:'single', text:'Что такое АЦП?', options:['Аналого-цифровой преобразователь','Арифметико-цифровой процессор','Автоматический цифровой прибор','Аналоговый цифровой переключатель'], correct:[0], explanation:'АЦП преобразует аналоговый сигнал в цифровой код.'},
+  {type:'single', text:'Что такое ЦАП?', options:['Цифро-аналоговый преобразователь','Цифровой арифметический процессор','Цифровой анализатор помех','Центральный аналоговый прибор'], correct:[0], explanation:'ЦАП преобразует цифровой код в аналоговый сигнал.'},
+  {type:'single', text:'Какой индикатор использует свечение люминофора под действием электронов?', options:['Вакуумно-люминесцентный','Жидкокристаллический','Газоразрядный','Светодиодный'], correct:[0], explanation:'ВЛИ — активный индикатор, свечение люминофора от электронного потока.'},
+  {type:'single', text:'Какой индикатор работает на переориентации жидкого кристалла в электрическом поле?', options:['ЖКИ','ВЛИ','Газоразрядный','Светодиодный'], correct:[0], explanation:'ЖКИ — жидкокристаллический индикатор.'},
+  {type:'single', text:'Сколько сегментов у типового семисегментного индикатора (без точки)?', options:['7','8','6','9'], correct:[0], explanation:'Сегменты a, b, c, d, e, f, g — семь.'},
+  {type:'single', text:'Что означает аббревиатура ТТЛ?', options:['Транзисторно-транзисторная логика','Транзисторно-тиристорная логика','Трансформаторно-транзисторная логика','Тиристорно-транзисторная логика'], correct:[0], explanation:'ТТЛ — транзисторно-транзисторная логика.'},
+  {type:'single', text:'Что означает КМОП?', options:['Комплементарная структура металл-оксид-полупроводник','Комбинированная металл-оксидная полупроводниковая логика','Коммутационная металл-оксидная полупроводниковая логика','Комплементарная микрооптическая полупроводниковая логика'], correct:[0], explanation:'КМОП — логика на комплементарных МОП-транзисторах.'},
+  {type:'single', text:'Какой параметр микросхемы характеризует минимальный интервал между двумя последовательными обращениями к ЗУ?', options:['Время цикла','Время доступа','Ёмкость','Энергозависимость'], correct:[0], explanation:'Время цикла — минимальный интервал между обращениями.'},
+  {type:'single', text:'Как называется ПЗУ, программируемое пользователем однократно?', options:['PROM','ROM','EPROM','EEPROM'], correct:[0], explanation:'PROM — однократно программируемое ПЗУ.'},
+
+  /* ---------- Вопросы с несколькими правильными ответами ---------- */
+  {type:'multi', text:'Какие устройства являются комбинационными схемами (без памяти)?', options:['Сумматор','Компаратор','Триггер','Мультиплексор'], correct:[0,1,3], explanation:'Сумматор, компаратор и мультиплексор — комбинационные. Триггер имеет память.'},
+  {type:'multi', text:'Какие законы алгебры логики записаны верно?', options:['¬(A ∧ B) = ¬A ∨ ¬B','A ∧ (B ∨ C) = (A ∧ B) ∨ (A ∧ C)','A ∨ (A ∧ B) = A','A ∧ ¬A = 1'], correct:[0,1,2], explanation:'Первые три верны; A ∧ ¬A = 0 (закон противоречия).'},
+  {type:'multi', text:'Какие утверждения о триггерах верны?', options:['Триггер хранит 1 бит','У RS-триггера S = R = 1 — запрещённая комбинация','JK-триггер при J = K = 1 переключается','Триггер — комбинационная схема'], correct:[0,1,2], explanation:'Триггер — последовательностная схема, поэтому последнее неверно.'},
+  {type:'multi', text:'Какие операции выполняет АЛУ?', options:['Сложение','Поразрядное И','Сдвиг','Хранение программ'], correct:[0,1,2], explanation:'Хранение программ — задача памяти, а не АЛУ.'},
+  {type:'multi', text:'Какие системы счисления являются позиционными?', options:['Двоичная','Восьмеричная','Римская','Шестнадцатеричная'], correct:[0,1,3], explanation:'Римская система — непозиционная.'},
+  {type:'multi', text:'Какие утверждения о дополнительном коде верны?', options:['Используется для представления отрицательных чисел','Позволяет заменить вычитание сложением','Отрицательное число получается инверсией всех бит и прибавлением 1','Имеет два представления нуля'], correct:[0,1,2], explanation:'В дополнительном коде ноль имеет единственное представление.'},
+  {type:'multi', text:'Какие устройства относятся к последовательностным (с памятью)?', options:['Триггер','Регистр','Счётчик','Сумматор'], correct:[0,1,2], explanation:'Сумматор — комбинационная схема без памяти.'},
+  {type:'multi', text:'Какие виды мультиплексоров существуют по числу входов?', options:['2:1','4:1','8:1','1:2'], correct:[0,1,2], explanation:'1:2 — это демультиплексор.'},
+  {type:'multi', text:'Какие параметры характеризуют цифровую микросхему?', options:['Время задержки распространения','Помехоустойчивость','Потребляемая мощность','Ёмкость накопителя'], correct:[0,1,2], explanation:'Ёмкость накопителя — параметр ЗУ, а не логической микросхемы.'},
+  {type:'multi', text:'Какие флаги формирует АЛУ?', options:['Z (нуля)','C (переноса)','S (знака)','P (чётности адреса)'], correct:[0,1,2], explanation:'Флаг P (чётности адреса) не является стандартным флагом АЛУ.'},
+  {type:'multi', text:'Какие устройства используются для преобразования кодов?', options:['Шифратор','Дешифратор','Мультиплексор','Демультиплексор'], correct:[0,1,2,3], explanation:'Все четыре могут выполнять преобразование кодов (мультиплексор/демультиплексор — при соответствующем включении).'},
+  {type:'multi', text:'Какие утверждения о счётчиках верны?', options:['Суммирующий счётчик увеличивает число','Вычитающий уменьшает число','Реверсивный работает в обе стороны','Счётчик — комбинационная схема'], correct:[0,1,2], explanation:'Счётчик — последовательностное устройство.'},
+  {type:'multi', text:'Какие типы регистров существуют по способу ввода/вывода?', options:['SISO','SIPO','PISO','PIPO'], correct:[0,1,2,3], explanation:'Все четыре варианта — стандартные типы.'},
+  {type:'multi', text:'Какие преимущества имеют цифровые сигналы перед аналоговыми?', options:['Длительное хранение без потерь','Качественная передача на большие расстояния','Простота отладки устройств','Принципиально большее предельное быстродействие'], correct:[0,1,2], explanation:'Предельное быстродействие у аналоговых устройств, как правило, выше.'},
+  {type:'multi', text:'Какие индикаторы относятся к активным (преобразующим электрическую энергию в световую)?', options:['Вакуумно-люминесцентный','Светодиодный','Газоразрядный','Жидкокристаллический'], correct:[0,1,2], explanation:'ЖКИ — пассивный индикатор, модулирующий внешний свет.'},
+  {type:'multi', text:'Какие законы алгебры логики существуют?', options:['Коммутативность','Ассоциативность','Дистрибутивность','Инверсивность'], correct:[0,1,2], explanation:'«Инверсивность» не является стандартным названием закона.'},
+  {type:'multi', text:'Какие элементы являются базовыми логическими элементами?', options:['И','ИЛИ','НЕ','Триггер'], correct:[0,1,2], explanation:'Триггер — не элементарный логический элемент, а запоминающая ячейка.'},
+  {type:'multi', text:'Какие утверждения о прямом коде верны?', options:['Старший бит — знаковый','Остальные биты — модуль числа','Существует два представления нуля','Он удобен для аппаратной арифметики'], correct:[0,1,2], explanation:'Прямой код неудобен для аппаратной арифметики — это его недостаток.'}
+];
+
+/* ----------------------------- ПАРАМЕТРЫ ТЕСТА ----------------------------- */
+const TEST_SIZE = 20; // сколько вопросов показывать из банка
+
+/* ----------------------------- УТИЛИТЫ ----------------------------- */
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Перемешивает варианты ответа и пересчитывает индексы правильных ответов
+function prepareQuestion(q) {
+  const indices = q.options.map((_, i) => i);
+  const shuffledIndices = shuffle(indices);
+  const newOptions = shuffledIndices.map(i => q.options[i]);
+  const newCorrect = q.correct
+    .map(origIndex => shuffledIndices.indexOf(origIndex))
+    .sort((a, b) => a - b);
+  return {
+    type: q.type,
+    text: q.text,
+    options: newOptions,
+    correct: newCorrect,
+    explanation: q.explanation
+  };
+}
+
+// Выбирает TEST_SIZE случайных вопросов и готовит их
+function buildTest() {
+  const picked = shuffle(questionBank).slice(0, TEST_SIZE);
+  return picked.map(prepareQuestion);
+}
+
+/* ----------------------------- ФУНКЦИЯ ОЦЕНКИ ----------------------------- */
+function getGrade(correct, total) {
+  const percent = correct / total * 100;
+  if (percent >= 90) {
+    return { mark: 5, label: 'Отлично', desc: '90–100% правильных ответов', cls: 'g5' };
+  } else if (percent >= 75) {
+    return { mark: 4, label: 'Хорошо', desc: '75–89% правильных ответов', cls: 'g4' };
+  } else if (percent >= 60) {
+    return { mark: 3, label: 'Удовлетворительно', desc: '60–74% правильных ответов', cls: 'g3' };
+  } else {
+    return { mark: 2, label: 'Неудовлетворительно', desc: 'менее 60% правильных ответов', cls: 'g2' };
+  }
+}
+
+/* ----------------------------- СОСТОЯНИЕ ----------------------------- */
+let currentQuestions = [];
+
+/* ----------------------------- РЕНДЕР ----------------------------- */
+const form = document.getElementById('quiz');
+const checkBtn = document.getElementById('checkBtn');
+const resetBtn = document.getElementById('resetBtn');
+const resultBox = document.getElementById('result');
+const progressFill = document.getElementById('progressFill');
+
+function renderQuestions() {
+  form.innerHTML = '';
+  currentQuestions.forEach((q, qi) => {
+    const card = document.createElement('div');
+    card.className = 'question-card';
+    card.dataset.index = qi;
+
+    const head = document.createElement('div');
+    head.className = 'q-head';
+    head.innerHTML = `
+      <div class="q-num">${qi + 1}</div>
+      <div>
+        <span class="q-type ${q.type}">${q.type === 'multi' ? 'Несколько правильных ответов' : 'Один правильный ответ'}</span>
+        <div class="q-text">${q.text}</div>
+      </div>`;
+    card.appendChild(head);
+
+    const ul = document.createElement('ul');
+    ul.className = 'options';
+
+    q.options.forEach((opt, oi) => {
+      const li = document.createElement('li');
+      const label = document.createElement('label');
+      const input = document.createElement('input');
+      input.type = q.type === 'multi' ? 'checkbox' : 'radio';
+      input.name = `q${qi}`;
+      input.value = oi;
+      input.addEventListener('change', updateProgress);
+
+      const span = document.createElement('span');
+      span.textContent = opt;
+
+      label.appendChild(input);
+      label.appendChild(span);
+      li.appendChild(label);
+      ul.appendChild(li);
+    });
+
+    card.appendChild(ul);
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback';
+    card.appendChild(fb);
+
+    form.appendChild(card);
+  });
+  updateProgress();
+}
+
+function getUserAnswer(qi) {
+  const inputs = form.querySelectorAll(`input[name="q${qi}"]`);
+  const selected = [];
+  inputs.forEach(inp => { if (inp.checked) selected.push(Number(inp.value)); });
+  return selected;
+}
+
+function arraysEqual(a, b) {
+  if (a.length !== b.length) return false;
+  const sa = [...a].sort((x, y) => x - y);
+  const sb = [...b].sort((x, y) => x - y);
+  return sa.every((v, i) => v === sb[i]);
+}
+
+function updateProgress() {
+  let answered = 0;
+  currentQuestions.forEach((q, qi) => {
+    if (getUserAnswer(qi).length > 0) answered++;
+  });
+  progressFill.style.width = (answered / currentQuestions.length * 100) + '%';
+}
+
+/* ----------------------------- ПРОВЕРКА ----------------------------- */
+function checkAnswers() {
+  let correctCount = 0;
+  const cards = form.querySelectorAll('.question-card');
+
+  currentQuestions.forEach((q, qi) => {
+    const card = cards[qi];
+    const userAns = getUserAnswer(qi);
+    const isCorrect = arraysEqual(userAns, q.correct);
+    if (isCorrect) correctCount++;
+
+    const labels = card.querySelectorAll('.options label');
+    labels.forEach((label, oi) => {
+      label.classList.remove('correct', 'incorrect');
+      const input = label.querySelector('input');
+      input.disabled = true;
+      const isRightOption = q.correct.includes(oi);
+      const isChosen = userAns.includes(oi);
+
+      if (isRightOption) label.classList.add('correct');
+      if (isChosen && !isRightOption) label.classList.add('incorrect');
+    });
+
+    const fb = card.querySelector('.feedback');
+    fb.className = 'feedback ' + (isCorrect ? 'ok' : 'bad');
+    fb.textContent = (isCorrect ? '✔ Верно. ' : '✘ Неверно. ') + q.explanation;
+  });
+
+  const percent = Math.round(correctCount / currentQuestions.length * 100);
+  let verdict = '';
+  if (percent === 100) verdict = 'Отличный результат! Все темы усвоены.';
+  else if (percent >= 80) verdict = 'Хороший результат, но есть небольшие пробелы.';
+  else if (percent >= 60) verdict = 'Удовлетворительно: стоит повторить часть тем.';
+  else verdict = 'Нужно повторить материал: много ошибок.';
+
+  // Оценка по 5-балльной шкале
+  const grade = getGrade(correctCount, currentQuestions.length);
+
+  resultBox.style.display = 'block';
+  resultBox.innerHTML = `
+    <span class="score">${correctCount} / ${currentQuestions.length}</span>
+    <span class="verdict">${percent}% правильных ответов. ${verdict}</span>
+    <div class="grade-box">
+      <span class="grade-label">Ваша оценка</span>
+      <div class="grade-value ${grade.cls}">${grade.mark} — ${grade.label}</div>
+      <div class="grade-desc">${grade.desc}</div>
+    </div>`;
+
+  checkBtn.disabled = true;
+  checkBtn.style.opacity = '.6';
+  resultBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ----------------------------- НОВЫЙ ТЕСТ ----------------------------- */
+function newTest() {
+  currentQuestions = buildTest();
+  renderQuestions();
+  resultBox.style.display = 'none';
+  resultBox.innerHTML = '';
+  checkBtn.disabled = false;
+  checkBtn.style.opacity = '1';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ----------------------------- ИНИЦИАЛИЗАЦИЯ ----------------------------- */
+newTest();
+checkBtn.addEventListener('click', checkAnswers);
+resetBtn.addEventListener('click', newTest);
+</script>
+</body>
+</html>
